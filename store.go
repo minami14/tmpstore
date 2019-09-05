@@ -14,9 +14,8 @@ type Store struct {
 	dir         string
 	maxFileSize int
 	duration    time.Duration
+	lifetime    time.Duration
 }
-
-const lifetime = time.Hour * 24
 
 func New(dir string) *Store {
 	if !strings.HasSuffix(dir, "/") {
@@ -32,6 +31,7 @@ func New(dir string) *Store {
 		dir:         dir,
 		maxFileSize: 1 << 20,
 		duration:    time.Hour,
+		lifetime:    time.Hour,
 	}
 }
 
@@ -40,7 +40,7 @@ func (s *Store) Run() {
 	for {
 		<-ticker.C
 		for name, t := range s.store {
-			if time.Now().Sub(t) > lifetime {
+			if time.Now().Sub(t) > s.lifetime {
 				if err := s.Remove(name); err != nil {
 					log.Println(err)
 				}
@@ -55,6 +55,10 @@ func (s *Store) SetMaxFileSize(size int) {
 
 func (s *Store) SetDuration(duration time.Duration) {
 	s.duration = duration
+}
+
+func (s *Store) SetLifetime(lifetime time.Duration) {
+	s.lifetime = lifetime
 }
 
 func (s *Store) Dir() string {
