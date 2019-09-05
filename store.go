@@ -15,6 +15,7 @@ type Store struct {
 	maxFileSize int
 	duration    time.Duration
 	lifetime    time.Duration
+	logger      *log.Logger
 }
 
 func New(dir string) *Store {
@@ -32,6 +33,7 @@ func New(dir string) *Store {
 		maxFileSize: 1 << 20,
 		duration:    time.Hour,
 		lifetime:    time.Hour,
+		logger:      &log.Logger{},
 	}
 }
 
@@ -42,7 +44,7 @@ func (s *Store) Run() {
 		for name, t := range s.store {
 			if time.Now().Sub(t) > s.lifetime {
 				if err := s.Remove(name); err != nil {
-					log.Println(err)
+					s.logger.Println(err)
 				}
 			}
 		}
@@ -81,7 +83,7 @@ func (s *Store) Store(name string, data []byte) error {
 
 	defer func() {
 		if err := f.Close(); err != nil {
-			log.Print(err)
+			s.logger.Print(err)
 		}
 	}()
 
@@ -133,7 +135,7 @@ func (s *Store) Remove(name string) error {
 func (s *Store) Clear() {
 	for name := range s.store {
 		if err := s.Remove(name); err != nil {
-			log.Println(err)
+			s.logger.Println(err)
 		}
 	}
 }
