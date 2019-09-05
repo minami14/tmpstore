@@ -10,8 +10,14 @@ import (
 	"github.com/minami14/tmpstore"
 )
 
+const (
+	mb = 1 << 20
+	maxFileSize = 100 * mb
+)
+
 func main() {
 	s := tmpstore.New("tmpstore")
+	s.SetMaxFileSize(maxFileSize)
 	go s.Run()
 	defer s.Clear()
 

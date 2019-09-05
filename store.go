@@ -10,8 +10,9 @@ import (
 )
 
 type Store struct {
-	store map[string]time.Time
-	dir   string
+	store       map[string]time.Time
+	dir         string
+	maxFileSize int
 }
 
 const (
@@ -50,6 +51,10 @@ func (s *Store) Run() {
 			}
 		}
 	}
+}
+
+func (s *Store) SetMaxFileSize(size int) {
+	s.maxFileSize = size
 }
 
 func (s *Store) Dir() string {
