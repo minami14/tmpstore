@@ -3,6 +3,7 @@ package main
 import (
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo"
@@ -13,11 +14,13 @@ import (
 const (
 	mb = 1 << 20
 	maxFileSize = 100 * mb
+	duration = time.Hour
 )
 
 func main() {
 	s := tmpstore.New("tmpstore")
 	s.SetMaxFileSize(maxFileSize)
+	s.SetDuration(duration)
 	go s.Run()
 	defer s.Clear()
 

@@ -13,15 +13,9 @@ type Store struct {
 	store       map[string]time.Time
 	dir         string
 	maxFileSize int
+	duration    time.Duration
 }
 
-const (
-	_  = iota
-	KB = 1 << (10 * iota)
-	MB
-)
-
-const maxSize = 100 * MB
 const lifetime = time.Hour * 24
 
 func New(dir string) *Store {
@@ -34,13 +28,15 @@ func New(dir string) *Store {
 	}
 
 	return &Store{
-		store: make(map[string]time.Time),
-		dir:   dir,
+		store:       make(map[string]time.Time),
+		dir:         dir,
+		maxFileSize: 1 << 20,
+		duration:    time.Hour,
 	}
 }
 
 func (s *Store) Run() {
-	ticker := time.NewTicker(1 * time.Hour)
+	ticker := time.NewTicker(s.duration)
 	for {
 		<-ticker.C
 		for name, t := range s.store {
@@ -57,6 +53,10 @@ func (s *Store) SetMaxFileSize(size int) {
 	s.maxFileSize = size
 }
 
+func (s *Store) SetDuration(duration time.Duration) {
+	s.duration = duration
+}
+
 func (s *Store) Dir() string {
 	return s.dir
 }
@@ -66,7 +66,7 @@ func (s *Store) Store(name string, data []byte) error {
 		return fmt.Errorf("data already exists %v", name)
 	}
 
-	if len(data) > maxSize {
+	if len(data) > s.maxFileSize {
 		return fmt.Errorf("data is too big %v", len(data))
 	}
 
