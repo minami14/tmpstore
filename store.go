@@ -18,18 +18,10 @@ type Store struct {
 	logger      *log.Logger
 }
 
-func New(dir string) *Store {
-	if !strings.HasSuffix(dir, "/") {
-		dir = dir + "/"
-	}
-
-	if err := os.MkdirAll(dir, 0660); err != nil {
-		log.Println(err)
-	}
-
+func New() *Store {
 	return &Store{
 		store:       make(map[string]time.Time),
-		dir:         dir,
+		dir:         "",
 		maxFileSize: 1 << 20,
 		duration:    time.Hour,
 		lifetime:    time.Hour,
@@ -61,6 +53,18 @@ func (s *Store) SetDuration(duration time.Duration) {
 
 func (s *Store) SetLifetime(lifetime time.Duration) {
 	s.lifetime = lifetime
+}
+
+func (s *Store) SetDirectory(dir string) {
+	if !strings.HasSuffix(dir, "/") {
+		dir = dir + "/"
+	}
+
+	if err := os.MkdirAll(dir, 0660); err != nil {
+		log.Println(err)
+	}
+
+	s.dir = dir
 }
 
 func (s *Store) Dir() string {

@@ -19,7 +19,8 @@ const (
 )
 
 func main() {
-	s := tmpstore.New("tmpstore")
+	s := tmpstore.New()
+	s.SetDirectory("tmpstore")
 	s.SetMaxFileSize(maxFileSize)
 	s.SetDuration(duration)
 	s.SetLifetime(lifetime)
