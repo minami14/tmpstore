@@ -42,7 +42,7 @@ func main() {
 			return err
 		}
 
-		return context.String(http.StatusOK, name)
+		return context.String(http.StatusCreated, name)
 	})
 
 	e.GET("/", func(context echo.Context) error {
@@ -52,6 +52,15 @@ func main() {
 		}
 
 		return context.File(s.Dir() + name)
+	})
+
+	e.DELETE("/", func(context echo.Context) error {
+		name := context.QueryParam("name")
+		if err := s.Remove(name); err != nil {
+			return err
+		}
+
+		return context.NoContent(http.StatusNoContent)
 	})
 
 	e.GET("/test", func(context echo.Context) error {
